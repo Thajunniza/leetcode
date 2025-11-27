@@ -4,98 +4,103 @@
 ===========================================================
 
 🧩 Problem:
-Given a string s, return True if the string can become a 
-palindrome after deleting **at most one character**.
-Otherwise, return False.
+Given a string `s`, return `True` if it can become a palindrome after 
+**deleting at most one character**.
 
-🎯 Goal:
-Allow ONE mistake in the string. If removing one character
-makes it a palindrome → return True.
-If no deletion helps → return False.
+A palindrome reads the same forward and backward.
 
 -----------------------------------------------------------
 Examples:
 -----------------------------------------------------------
 
 Example 1:
-Input:  "aba"
+Input:  s = "aba"
 Output: True
-Explanation: Already a palindrome. No deletion required.
+Explanation: Already a palindrome.
 
 Example 2:
-Input:  "abca"
+Input:  s = "abca"
 Output: True
-Explanation: Remove 'b' → "aca" or remove 'c' → "aba"
+Explanation:
+    Delete 'b' → "aca"
+    or delete 'c' → "aba"
 
 Example 3:
-Input:  "abc"
+Input:  s = "abc"
 Output: False
-Explanation: Even after deleting one character, it cannot 
-             be made into a palindrome.
-
-Example 4:
-Input:  "deeee"
-Output: True
-Explanation: Remove 'd' → "eeee"
+Explanation:
+    Removing one character cannot fix the mismatch.
 
 -----------------------------------------------------------
-Algorithm — Two Pointers + One Skip:
+🎯 Core Logic:
 -----------------------------------------------------------
-1. Use two pointers:
-       left  = 0
-       right = len(s) - 1
 
-2. While left < right:
-       - If characters match → move inward.
-       - If mismatch:
-            → Option A: skip left char (left+1, right)
-            → Option B: skip right char (left, right-1)
-         Check if EITHER remaining substring is palindrome.
+Use the **Two-Pointer** technique:
 
-3. If both options fail → return False.
+1️⃣ Start with pointers:
+    - `l = 0` (left)
+    - `r = len(s) - 1` (right)
 
-4. If no mismatches or fixable by one delete → return True.
+2️⃣ While characters match (`s[l] == s[r]`):
+    - Move inward → `l += 1`, `r -= 1`
+
+3️⃣ When you hit the **first mismatch**, you have two choices:
+    - Skip left character → check substring `s[l+1 : r+1]`
+    - Skip right character → check substring `s[l : r]`
+
+4️⃣ If **either** substring is a palindrome → return True  
+5️⃣ If neither works → return False
+
+💡 At most **one deletion** is allowed, and we check both possibilities.
 
 -----------------------------------------------------------
-⏱ Time Complexity:   O(n)
-💾 Space Complexity:  O(1)
+🧠 Approach:
 -----------------------------------------------------------
+
+- Use two pointers to scan the string.
+- Only at the first mismatch, try both deletion paths.
+- Use slicing + reverse (`[::-1]`) to check quickly if the substring is a palindrome.
+
+-----------------------------------------------------------
+💡 Code (Simple & Readable Version):
+-----------------------------------------------------------
+
+```python
 """
-
-
-# ------------------------------------
-# Valid Palindrome II (Two Pointers)
-# ------------------------------------
-def is_palindrome_after_one_delete(s: str) -> bool:
-
-    def is_pal(i: int, j: int) -> bool:
-        """Check if s[i..j] is a palindrome."""
-        while i < j:
-            if s[i] != s[j]:
-                return False
-            i += 1
-            j -= 1
+class Solution(object):
+    def validPalindrome(self, s):
+        """
+        :type s: str
+        :rtype: bool
+        """
+        l = 0
+        r = len(s) - 1
+        
+        while l < r:
+            if s[l] == s[r]:
+                l += 1
+                r -= 1
+            else:
+                skipL = s[l+1:r+1]   # delete left character
+                skipR = s[l:r]       # delete right character
+                return skipL == skipL[::-1] or skipR == skipR[::-1]
+        
         return True
+    
 
-    left, right = 0, len(s) - 1
-
-    while left < right:
-        if s[left] == s[right]:
-            left += 1
-            right -= 1
-        else:
-            # Try skipping left or skipping right
-            return is_pal(left + 1, right) or is_pal(left, right - 1)
-
-    return True
-
-
-# ------------------------------------
-# Driver Test
-# ------------------------------------
 if __name__ == "__main__":
+    sol = Solution()
 
-    print(is_palindrome_after_one_delete("aba"))     # True
-    print(is_palindrome_after_one_delete("abca"))    # True
-    print(is_palindrome_after_one_delete("abc"))     # False
-    print(is_palindrome_after_one_delete("deeee"))   # True
+    tests = [
+        ("aba", True),
+        ("abca", True),
+        ("abc", False),
+        ("deeee", True),
+        ("cbbcc", True),
+        ("abcdba", True),   # delete 'c' → "abdba"
+        ("abcd", False),
+    ]
+
+    for s, expected in tests:
+        result = sol.validPalindrome(s)
+        print("Input: {!r}, Output: {}, Expected: {}".format(s, result, expected))    
