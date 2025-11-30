@@ -74,9 +74,7 @@ This effectively:
 
 2. While i < n:
        if nums[i] != 0:
-           nums[p] = nums[i]
-           if i != p:
-               nums[i] = 0
+           nums[i],nums[p] = nums[p],nums[i]
            p += 1
        i += 1
 
@@ -114,9 +112,7 @@ class Solution(object):
 
         while i < n:
             if nums[i] != 0:
-                nums[p] = nums[i]
-                if i != p:
-                    nums[i] = 0
+                nums[i],nums[p] = nums[p],nums[i]
                 p += 1
             i += 1
 

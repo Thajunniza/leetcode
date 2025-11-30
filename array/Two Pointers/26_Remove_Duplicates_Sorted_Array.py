@@ -125,11 +125,13 @@ class Solution(object):
             return 0
 
         p = 0  # last unique element index
-
-        for i in range(1, n):
-            if nums[i] != nums[p]:
+        
+        for i in range(1,n):
+            if nums[i] != nums[i - 1]:
                 p += 1
                 nums[p] = nums[i]
+        return p
+        
 
         return p + 1
 

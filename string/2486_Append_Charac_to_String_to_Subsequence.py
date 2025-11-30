@@ -1,122 +1,100 @@
 """
 ===========================================================
-2486. Append Characters to String to Make Subsequence
+2486. Append Characters to String
 ===========================================================
 
 🧩 Problem:
-You are given two strings `s` (source) and `t` (target).
+You are given two strings **s** and **t**.
+Your task is to determine the **minimum number of characters** you must append 
+to the end of **s** so that **t becomes a subsequence of s**.
 
-In one operation, you may append **any character from `t`** to the end of `s`.
-
-Return the **minimum number of characters** that must be appended to `s`
-so that `t` becomes a **subsequence** of `s`.
-
-A subsequence keeps the relative order of letters but may skip characters.
-
-🎯 Goal:
-Match as many characters of `t` as possible inside `s` from left to right.
-Whatever part of `t` cannot be matched must be appended.
+A subsequence means:
+Characters of t must appear in s **in the same order**, but not necessarily contiguously.
 
 -----------------------------------------------------------
-Examples:
+Example:
 -----------------------------------------------------------
 
 Example 1:
 Input:
     s = "coaching"
     t = "coding"
-Output: 4
+Output:
+    4
 Explanation:
-    Matched inside s → "c", "o"
-    Unmatched part → "ding" → append 4 characters
+    Current subsequence matched: "co" → "co"
+    Remaining characters: "ding" → need to append 4 chars.
 
 Example 2:
 Input:
-    s = "abcde"
-    t = "a"
-Output: 0
+    s = "abc"
+    t = "abc"
+Output:
+    0
 Explanation:
-    "a" is already a subsequence.
+    Already a subsequence.
 
 Example 3:
 Input:
-    s = "z"
-    t = "abc"
-Output: 3
-Explanation:
-    No characters matched. Need to append all "abc".
-
-Example 4:
-Input:
     s = "abc"
-    t = "abc"
-Output: 0
+    t = "abcd"
+Output:
+    1
 Explanation:
-    Entire target already matched.
+    Missing only 'd'.
 
 -----------------------------------------------------------
-Algorithm — Two Pointers (Greedy Match):
+🎯 Goal:
+Find how many characters from **t** are NOT present as a subsequence in **s**, 
+and append them.
+
+===========================================================
+✅ Two-Pointer Approach (Optimal)
+===========================================================
+
+We use two pointers:
+- **p** → walks through `s`
+- **q** → walks through `t`
+
+Whenever `s[p] == t[q]`, we move q (meaning we matched one character of t).
+Always move p to continue scanning s.
+
+At the end:
+- `q` = number of matched characters
+- answer = `len(t) - q`
+
 -----------------------------------------------------------
-1. Use pointer `p` on `s` and loop pointer `q` on `t`.
-
-2. For each character t[q]:
-       Scan forward in s starting from p:
-            - While p < len(s) and s[p] != t[q]:
-                  p += 1
-
-       - If p reaches end → cannot match t[q] → 
-         Remaining characters of t must be appended:
-             return len(t) - q
-
-       - Else: we matched t[q] → p += 1
-
-3. If the whole t is matched:
-       return 0
-
------------------------------------------------------------
-⏱ Time Complexity:   O(len(s) + len(t))
-💾 Space Complexity:  O(1)
+⏱️ Time Complexity:  O(n1 + n2)
+📦 Space Complexity: O(1)
 -----------------------------------------------------------
 
+===========================================================
+💡 Python Solution
+===========================================================
+
+```python
 """
 
-# -------------------------------------------------
-# 2486. Append Characters to String to Make Subsequence
-# Two Pointers — Greedy Match
-# -------------------------------------------------
-def appendCharacters(s: str, t: str) -> int:
-    """
-    Return the minimum number of characters to append to `s`
-    so that `t` becomes a subsequence of `s`.
+def appendCharacters(s, t):
+        """
+        :type s: str
+        :type t: str
+        :rtype: int
+        """
+        p = 0  # pointer for s
+        q = 0  # pointer for t
+        n1 = len(s)
+        n2 = len(t)
 
-    Args:
-        s (str): Source string.
-        t (str): Target string.
-
-    Returns:
-        int: Number of characters to append.
-
-    Example:
-        >>> appendCharacters("coaching", "coding")
-        4
-    """
-    p = 0
-    n = len(s)
-
-    for q in range(len(t)):
-        # Scan s until we match t[q]
-        while p < n and s[p] != t[q]:
+        # Match as many chars of t inside s as possible
+        while p < n1 and q < n2:
+            if s[p] == t[q]:
+                q += 1
             p += 1
 
-        # If no more characters in s, everything from t[q:] must be appended
-        if p == n:
-            return len(t) - q
+        # Remaining unmatched chars in t
+        return n2 - q
 
-        # If matched, move p forward in s
-        p += 1
-
-    # All characters matched
-    return 0
 
 
 # -------------------------------------------------

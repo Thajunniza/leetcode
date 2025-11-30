@@ -103,6 +103,18 @@ Let:
 """
 class Solution(object):
     def reverseWords(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        arr = s.split()
+        result = []
+        for c in arr:
+            result.append(c[::-1])
+        return " ".join(result)
+    
+class Solution(object):
+    def reverseWords(self, s):
         chars = list(s)
         n = len(chars)
         p = 0  # start of each word
