@@ -91,9 +91,9 @@ class Solution(object):
             if ch == '(':
                 stack.append([])  # Start new level
             elif ch == ')':
-                cur = stack.pop()  # Finish this level
-                cur.reverse()      # Reverse substring
-                stack[-1].extend(cur)  # Append to previous level
+                temp = stack.pop()  # Finish this level
+                temp = temp[::-1]      # Reverse substring
+                stack[-1].extend(temp)  # Append to previous level
             else:
                 stack[-1].append(ch)  # Add normal characters
 
