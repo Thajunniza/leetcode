@@ -214,9 +214,8 @@ def min_moves_to_make_palindrome(s: str) -> int:
 
         if k == i:
             # Case B: no match on the right → this is the middle char
-            moves += (n // 2) - i
-            # Only move the left pointer inward
-            i += 1
+            l[i], l[i + 1] = l[i + 1], l[i]
+            count += 1
         else:
             # Case A: found a match → bubble it to position j
             while k < j:
