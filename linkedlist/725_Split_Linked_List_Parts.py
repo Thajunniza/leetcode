@@ -28,38 +28,35 @@ class Solution(object):
         Split the linked list into k parts.
         """
         result = [None] * k
-
-        # Step 1: Find length of the list
-        curr = head
+        # Edge Case
+        if not head:
+            return result
         n = 0
+        curr = head
+        # Get the count length
         while curr:
             n += 1
             curr = curr.next
-
-        # Step 2: Determine base size and extra nodes
-        base = n // k          # minimum size of each part
-        extra = n % k          # first 'extra' parts get one more node
-
+        # Calculate the elemnts
+        extra = n % k
+        count = n // k
         curr = head
-
-        # Step 3: Split the list
+        #Split based on calculation
         for i in range(k):
             if not curr:
-                result[i] = None
                 continue
-
+            final = count + 1 if i < extra else count
             result[i] = curr
-            part_size = base + (1 if i < extra else 0)
-
-            # Move to the last node of this part
-            for _ in range(part_size - 1):
+            for _ in range(final-1):
+                if not curr.next:
+                    break
                 curr = curr.next
-
-            # Cut the list
-            next_part = curr.next
-            curr.next = None
-            curr = next_part
-
+            if curr:
+                temp = curr.next
+                curr.next = None
+                curr = temp
+            else:
+                break
         return result
 
 # ------------------------------------
