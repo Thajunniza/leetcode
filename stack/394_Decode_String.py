@@ -8,7 +8,7 @@ You are given an encoded string `s`. The encoding rule is:
     - `k[encoded_string]` means the `encoded_string` inside the square brackets
       is repeated exactly `k` times.
     - `k` is a positive integer.
-    - You may assume that the input string is always valid and contains no extra spaces.
+    - The input string is always valid.
     - Nested encoding is allowed.
 
 Examples:
@@ -17,7 +17,6 @@ Examples:
 
 🎯 Goal:
 Decode the string and return it.
-Time: O(n), Space: O(n).
 
 -----------------------------------------------------------
 Examples:
@@ -36,72 +35,98 @@ Input:  s = "2[abc]3[cd]ef"
 Output: "abcabccdcdcdef"
 
 -----------------------------------------------------------
-Algorithm — Stack-Based Approach:
+Algorithm — Stack-Based Approach (Your Logic):
 -----------------------------------------------------------
 
-Core idea:
-Use a stack to handle nested brackets and repeated sequences.
+Core Idea:
+Use a single stack to store:
+    - numbers (repeat counts)
+    - opening brackets '['
+    - characters / decoded substrings
+
+A temporary list `substr` is used to collect characters when decoding
+a bracketed expression.
 
 Steps:
 1. Initialize:
-       stack = [[]]   # acts as a stack of lists
-       num = 0        # to accumulate digits for multiplier
+       stack = []      # holds numbers, '[', and strings
+       substr = []     # collects substring during decoding
+       num = 0         # builds multi-digit repeat counts
 
 2. Iterate through each character `c` in `s`:
        - If `c` is a digit:
-             • Update num = num * 10 + int(c)
-       - If `c` == '[':
-             • Push num and a new empty list onto stack
-             • Reset num = 0
-       - If `c` == ']':
-             • Pop the last list (chars) and multiplier
-             • Repeat chars * multiplier and append to previous list
-       - Else (alphabet):
-             • Append character to current list
+             • Build the full number using:
+               num = num * 10 + int(c)
 
-3. Join the first list in stack to form the final decoded string.
+       - If `c` == '[':
+             • Push the current number to stack
+             • Push '[' to mark the start of substring
+             • Reset num = 0
+
+       - If `c` == ']':
+             • Pop elements from stack until '[' is found
+             • Store popped characters in `substr`
+             • Pop '['
+             • Pop repeat count `k`
+             • Reverse `substr`, join it, and repeat `k` times
+             • Push decoded string back to stack
+             • Reset `substr` and `num`
+
+       - Else (alphabet character):
+             • Push character onto stack
+
+3. After traversal:
+       - Join all elements in stack to form the final decoded string
 
 Why this works:
-- The stack keeps track of nested sequences.
-- When we hit ']', we know the scope of repetition and can expand it.
+- The stack preserves order and nesting.
+- Each ']' defines a complete decoding scope.
+- Reversing `substr` restores correct character order.
+- Supports nested and multi-digit encodings.
 
 -----------------------------------------------------------
 ⏱ Time & Space Complexity:
 -----------------------------------------------------------
 
-Time Complexity:   O(n)  
-Space Complexity:  O(n)  
+Time Complexity:   O(n + output_size)
+Space Complexity:  O(n + output_size)
 
 -----------------------------------------------------------
 """
-
 class Solution(object):
     def decodeString(self, s):
-        stack = [[]]
+        """
+        :type s: str
+        :rtype: str
+        """
+        stack = []
+        substr = []
         num = 0
-
         for c in s:
             if c.isdigit():
                 num = num * 10 + int(c)
-            elif c == "[":
+                continue
+            if c == "[":
                 stack.append(num)
-                stack.append([])
+                stack.append(c)
                 num = 0
             elif c == "]":
-                chars = stack.pop()
-                repeat = stack.pop()
-                stack[-1].extend(chars * repeat)
+                while stack and stack[-1] != "[":
+                    substr.append(stack.pop())
+                stack.pop()
+                k = int(stack.pop())
+                decoded = "".join(substr[::-1]) * k
+                stack.append(decoded)
+                substr = []
+                num = 0
             else:
-                stack[-1].append(c)
-
-        return "".join(stack[0])
-
-# ------------------------------------
-# Driver Test
-# ------------------------------------
-
+                stack.append(c)
+        
+        return "".join(stack)
+    
+    
 sol = Solution()
-print(sol.decodeString("3[a]2[bc]"))       # aaabcbc
-print(sol.decodeString("3[a2[c]]"))        # accaccacc
-print(sol.decodeString("2[abc]3[cd]ef"))   # abcabccdcdcdef
-print(sol.decodeString("50[Thaj]"))   # abcabccdcdcdef
+print(sol.decodeString("3[a]2[bc]"))        # aaabcbc
+print(sol.decodeString("3[a2[c]]"))         # accaccacc
+print(sol.decodeString("2[abc]3[cd]ef"))    # abcabccdcdcdef
+print(sol.decodeString("50[Thaj]"))          # Thaj repeated 50 times
