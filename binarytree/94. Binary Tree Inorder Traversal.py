@@ -127,6 +127,19 @@ class Solution():
             dfs(node.right)
         dfs(root)
         return result
+    
+    def inorder_iterative(self,root):
+        result = []
+        stack = []
+        curr = root
+        while curr or stack:
+            while curr:
+                stack.append(curr)
+                curr = curr.left
+            curr = stack.pop()
+            result.append(curr.val)
+            curr = curr.right
+        return result
 
 
 def build_tree(level):
@@ -158,5 +171,7 @@ def build_tree(level):
 sol = Solution()
 root = build_tree([1,None,2,3])
 print(sol.inorder_traversal_rec(root))
+print(sol.inorder_iterative(root))
 root = build_tree([1,2,3,4,5,None,8,None,None,6,7,9])
 print(sol.inorder_traversal_rec(root))
+print(sol.inorder_iterative(root))
