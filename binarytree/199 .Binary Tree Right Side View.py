@@ -1,6 +1,6 @@
 """
 ===========================================================
-LeetCode 199: Binary Tree Right Side View
+199: Binary Tree Right Side View
 ===========================================================
 
 Given a binary tree, imagine yourself standing on the right side of it,
