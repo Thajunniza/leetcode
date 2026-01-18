@@ -1,108 +1,170 @@
 """
-100: Same Tree
+LeetCode 100: Same Tree
 
-Problem:
----------
-Given the roots of two binary trees p and q, write a function to check if they are the same.
-Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
+Given the roots of two binary trees p and q, write a function to check if they 
+are the same or not. Two binary trees are considered the same if they are 
+structurally identical, and the nodes have the same value.
 
-Example:
---------
-Input: p = [1,2,3], q = [1,2,3]
-Output: True
+Example 1:
+    Input: p = [1,2,3], q = [1,2,3]
+        p:   1           q:   1
+            / \              / \
+           2   3            2   3
+    Output: true
 
-Input: p = [1,2], q = [1,None,2]
-Output: False
+Example 2:
+    Input: p = [1,2], q = [1,null,2]
+        p:   1           q:   1
+            /                  \
+           2                    2
+    Output: false
 
-Input: p = [1,2,1], q = [1,1,2]
-Output: False
+Example 3:
+    Input: p = [1,2,1], q = [1,1,2]
+        p:   1           q:   1
+            / \              / \
+           2   1            1   2
+    Output: false
 
-Algorithm:
-----------
-- Use recursion (DFS) to traverse both trees simultaneously
-- Base cases:
-    1. Both nodes are None → return True
-    2. One node is None → return False
-    3. Node values differ → return False
-- Recurse on left and right subtrees
-- Return True only if both left and right subtrees match
+Algorithm: Recursive DFS (Depth-First Search)
+- Base cases: both null (true), one null (false)
+- Check if current values match
+- Recursively check left and right subtrees
 
-Time Complexity: O(n) where n is the number of nodes (visit each node once)
-Space Complexity: O(h) recursion stack, h = height of tree
+Time Complexity: O(min(n, m))
+- Visit each node once until mismatch is found
+- In worst case (identical trees), visit all nodes
+- n = number of nodes in p, m = number of nodes in q
+
+Space Complexity: O(min(h_p, h_q))
+- Recursion stack depth equals height of shorter tree
+- h_p = height of tree p, h_q = height of tree q
+- Best case O(log n) for balanced tree
+- Worst case O(n) for skewed tree
 """
 
+from typing import Optional
 from collections import deque
 
-# Definition for a binary tree node.
-class TreeNode(object):
+class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
         self.left = left
         self.right = right
 
-# Helper: Convert array (level-order) to binary tree
-def array_to_bt(arr):
-    if not arr or arr[0] is None:
-        return None
-
-    root = TreeNode(arr[0])
-    queue = deque([root])
-    i = 1
-
-    while queue and i < len(arr):
-        node = queue.popleft()
-
-        # Left child
-        if i < len(arr) and arr[i] is not None:
-            node.left = TreeNode(arr[i])
-            queue.append(node.left)
-        i += 1
-
-        # Right child
-        if i < len(arr) and arr[i] is not None:
-            node.right = TreeNode(arr[i])
-            queue.append(node.right)
-        i += 1
-
-    return root
-
-# Solution: Recursive DFS
-class Solution(object):
-    def isSameTree(self, p, q):
+class Solution:
+    def isSameTree(self, p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
         """
-        :type p: TreeNode
-        :type q: TreeNode
-        :rtype: bool
+        Recursive approach - most elegant and intuitive.
         """
-        # Both nodes are None
+        # Both null - same structure
         if not p and not q:
             return True
-        # One node is None
+        
+        # One is null, other is not - different structure
         if not p or not q:
             return False
-        # Node values differ
+        
+        # Values differ - not same
         if p.val != q.val:
             return False
-        # Recurse on left and right subtrees
+        
+        # Check left and right subtrees recursively
+        return (self.isSameTree(p.left, q.left) and 
+                self.isSameTree(p.right, q.right))
+
+
+# Alternative: Iterative BFS approach
+class SolutionIterative:
+    def isSameTree(self, p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+        """
+        Iterative approach using BFS with queue.
+        Useful if you want to avoid recursion stack.
+        """
+        queue = deque([(p, q)])
+        
+        while queue:
+            node1, node2 = queue.popleft()
+            
+            # Both null - continue
+            if not node1 and not node2:
+                continue
+            
+            # One is null or values differ - not same
+            if not node1 or not node2 or node1.val != node2.val:
+                return False
+            
+            # Add children to queue
+            queue.append((node1.left, node2.left))
+            queue.append((node1.right, node2.right))
+        
+        return True
+
+
+# Alternative: Concise one-liner recursive
+class SolutionOneLiner:
+    def isSameTree(self, p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
+        """
+        Ultra-concise version - same logic, compressed.
+        """
+        if not p and not q:
+            return True
+        if not p or not q or p.val != q.val:
+            return False
         return self.isSameTree(p.left, q.left) and self.isSameTree(p.right, q.right)
 
-# =======================
-# Test Cases
-# =======================
-if __name__ == "__main__":
+
+# Test cases
+def test():
+    # Helper to build tree
+    def build_tree(values):
+        if not values:
+            return None
+        
+        root = TreeNode(values[0])
+        queue = deque([root])
+        i = 1
+        
+        while queue and i < len(values):
+            node = queue.popleft()
+            
+            if i < len(values) and values[i] is not None:
+                node.left = TreeNode(values[i])
+                queue.append(node.left)
+            i += 1
+            
+            if i < len(values) and values[i] is not None:
+                node.right = TreeNode(values[i])
+                queue.append(node.right)
+            i += 1
+        
+        return root
+    
     sol = Solution()
+    
+    # Test 1: Same trees
+    p1 = build_tree([1, 2, 3])
+    q1 = build_tree([1, 2, 3])
+    print(sol.isSameTree(p1, q1))  # True
+    
+    # Test 2: Different structure
+    p2 = build_tree([1, 2])
+    q2 = build_tree([1, None, 2])
+    print(sol.isSameTree(p2, q2))  # False
+    
+    # Test 3: Different values
+    p3 = build_tree([1, 2, 1])
+    q3 = build_tree([1, 1, 2])
+    print(sol.isSameTree(p3, q3))  # False
+    
+    # Test 4: Both null
+    p4 = build_tree([])
+    q4 = build_tree([])
+    print(sol.isSameTree(p4, q4))  # True
+    
+    # Test 5: One null, one not
+    p5 = build_tree([1])
+    q5 = build_tree([])
+    print(sol.isSameTree(p5, q5))  # False
 
-    tests = [
-        ([1,2,3], [1,2,3], True),
-        ([1,2], [1,None,2], False),
-        ([1,2,1], [1,1,2], False),
-        ([], [], True),
-        ([1], [1], True),
-        ([1], [], False)
-    ]
-
-    for i, (arr1, arr2, expected) in enumerate(tests, 1):
-        p = array_to_bt(arr1)
-        q = array_to_bt(arr2)
-        result = sol.isSameTree(p, q)
-        print(f"Test Case {i}: Result={result} | Expected={expected} | {'PASS' if result==expected else 'FAIL'}")
+test()
