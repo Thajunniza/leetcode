@@ -91,7 +91,10 @@ class SolutionIterative:
                 continue
             
             # One is null or values differ - not same
-            if not node1 or not node2 or node1.val != node2.val:
+            if not node1 or not node2:
+                return False
+
+            if node1.val != node2.val:
                 return False
             
             # Add children to queue
