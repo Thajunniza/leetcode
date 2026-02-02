@@ -1,6 +1,5 @@
 """
-Problem: Search a 2D Matrix
-LeetCode: 74
+74: Search a 2D Matrix
 
 Given an m x n matrix where:
 - Each row is sorted in ascending order
