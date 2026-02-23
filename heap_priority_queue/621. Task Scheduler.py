@@ -1,4 +1,4 @@
-# 621. Task Scheduler — Heap Simulation
+# 621. Task Scheduler
 #
 # This module computes the least number of intervals needed to finish all tasks with a cooldown,
 # using a max-heap + cooldown queue simulation.
